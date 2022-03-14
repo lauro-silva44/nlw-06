@@ -1,11 +1,30 @@
-import express from 'express';
+import "reflect-metadata";
+import express, { NextFunction, Response, Request } from "express";
+import "express-async-errors";
+
+import { router } from "./routes";
+
+import "./database";
 
 const app = express();
-app.listen(3000, () => {console.log("The Server is alive")}); 
+app.use(express.json());
+app.use(router);
 
-app.get('/test', (req, res)=> {
-  return res.send("hi world, freazing here");
-})
-app.post('/test-post', (req, res)=> {
-  return res.send('checking method put')
-})
+
+app.use(
+  (err: Error, request: Request, response: Response, next: NextFunction) => {
+    if (err instanceof Error) {
+      return response.status(400).json({
+         error: err.message
+        })
+
+    }
+    return response.status(500).json({
+      status: "error",
+      error: "Internal Server Error",
+    });
+  }
+);
+
+
+app.listen(3000, () => console.log("Server is alive"));
